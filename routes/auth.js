@@ -38,20 +38,23 @@ router.post('/login',async (req, res)=>{
         const user= await User.findOne({username:req.body.username});
         if(!user){
            return  res.status(500).json({
-                message:"Invalid username and password"
+                message:"Invalid username and password",
+                isLogin:false
             })
         }
         const matchedPassword=await bcrypt.compare(req.body.password, user.password);
         if(!matchedPassword){
            return res.status(500).json({
-                message:"Invalid username and password"
+                message:"Invalid username and password",
+                isLogin:false
             })
         }
        const access_token=jwt.sign({
         id:user._id,
         name:user.name,
         email:user.email,
-        isAdmin:user.isAdmin
+        isAdmin:user.isAdmin,
+        isLogin:true
        },process.env.JWT_SECRET,{expiresIn:"24h"})
        const {password, ...other}=user._doc;
        return res.status(200).json({access_token,user:other});
